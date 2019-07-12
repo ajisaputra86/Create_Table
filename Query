@@ -1,0 +1,102 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+SET timezone = 'Asia/Jakarta';
+
+
+CREATE TABLE tbl_image (
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+file_name TEXT,
+mime TEXT,
+image BYTEA,
+UNIQUE(file_name)
+);
+
+CREATE TABLE tbl_admin(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+name TEXT NOT NULL,
+email TEXT NOT NULL,
+image_id TEXT,
+status TEXT,
+UNIQUE(email)
+);
+
+CREATE TABLE tbl_agent(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+name TEXT NOT NULL,
+email TEXT NOT NULL,
+image_id TEXT,
+status TEXT,
+UNIQUE(email)
+);
+
+
+CREATE TABLE tbl_company(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+company_code TEXT NOT NULL,
+company_name TEXT NOT NULL,
+address TEXT NOT NULL,
+image_id TEXT,
+status TEXT,
+UNIQUE(company_code)
+);
+
+CREATE TABLE tbl_mapping(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+agent_id TEXT REFERENCES tbl_agent(id) NOT NULL,
+company_id TEXT REFERENCES tbl_company(id) NOT NULL,
+UNIQUE(company_id)
+);
+
+CREATE TABLE tbl_customer(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+company_id TEXT REFERENCES tbl_company(id),
+name TEXT NOT NULL,
+email TEXT NOT NULL,
+position TEXT NOT NULL,
+image_id TEXT,
+status TEXT,
+UNIQUE(email)
+);
+
+CREATE TABLE tbl_ticket(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+ticket_code TEXT NOT NULL,
+agent_id TEXT REFERENCES tbl_agent(id) NOT NULL,
+ticket_date DATE NOT NULL,
+title TEXT NOT NULL,
+customer_id TEXT REFERENCES tbl_customer(id) NOT NULL,
+status TeXT NOT NULL,
+UNIQUE(ticket_code)
+);
+
+CREATE TABLE tbl_detail_ticket(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+ticket_id TEXT REFERENCES tbl_ticket(id) NOT NULL,
+sender TEXT,
+message TEXT,
+message_date TIMESTAMPTZ NOT NULL,
+UNIQUE(ticket_id,message_date)
+);
+
+CREATE TABLE tbl_subdtl_ticket(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+detail_ticket_id TEXT,
+ss bytea,
+file_name TEXT,
+mime TEXT,
+UNIQUE(detail_ticket_id, file_name)
+);
+
+
+
+CREATE TABLE tbl_user(
+id TEXT DEFAULT uuid_generate_v1() NOT NULL PRIMARY KEY,
+username TEXT NOT NULL,
+password TEXT NOT NULL,
+role TEXT NOT NULL,
+user_id TEXT NOT NULL,
+UNIQUE(username)
+);
+
+	
+	
